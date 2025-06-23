@@ -38,6 +38,22 @@ The project is organized into the following main directories:
 - **Detailed Reporting**: Integration with Allure Report provides comprehensive and easy-to-understand test results, including request/response details.
 - **Maven Build**: Standardized build process using Maven simplifies dependency management and test execution.
 
+## 🧪 Testing Strategy
+
+Our testing strategy focuses on providing comprehensive and maintainable API test coverage.
+
+-   **Test Flow Approach**: Tests are designed to follow typical user workflows and API interactions, including request chaining where the output of one API call (like authentication tokens or created resource IDs) is used as input for subsequent calls. This is evident in tests like `BookCrudTest` which covers the full lifecycle of a book.
+-   **Reliability and Maintainability**:
+    -   **Structured Code**: The framework uses a layered approach with dedicated 'steps' classes (`AuthSteps`, `BookSteps`, `SignupSteps`) to encapsulate API interactions, promoting reusability and keeping test methods clean and focused on test logic.
+    -   **Strong Assertions**: AssertJ is used for fluent and readable assertions, making it clear what is being validated in each test.
+    -   **Data Modeling**: API request and response payloads are represented by Java model classes, ensuring type safety and reducing errors.
+    -   **Configuration Management**: Externalizing configuration in `config.properties` and using `ConfigLoader` allows easy switching between environments without code changes.
+    -   **Logging**: Integrated logging provides visibility into test execution and API responses, aiding in debugging.
+-   **Challenges Faced**:
+    -   Handling dynamic data like authentication tokens and generated resource IDs requires careful implementation of request chaining.
+    -   Ensuring comprehensive negative test coverage for various error conditions (e.g., invalid input, unauthorized access) requires thorough API analysis.
+    -   Setting up and managing the test environment and dependencies can sometimes pose challenges.
+
 ## ▶️ Prerequisites
 
 - **Java Development Kit (JDK)**: Version 8 or higher.

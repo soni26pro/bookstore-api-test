@@ -1,22 +1,23 @@
 package com.bookstore.api.tests;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.bookstore.api.models.Book;
 import com.bookstore.api.models.UserCredentials;
 import com.bookstore.api.steps.AuthSteps;
 import com.bookstore.api.steps.BookSteps;
 import com.bookstore.api.steps.SignupSteps;
 import com.github.javafaker.Faker;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import io.qameta.allure.testng.Tag;
 import io.restassured.response.Response;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * End-to-end test class to validate the full CRUD lifecycle of a book
@@ -72,6 +73,7 @@ public class BookCrudTest {
 
         Response createRes = bookSteps.createBook(authToken, testBook);
         assertThat(createRes.statusCode()).isEqualTo(200);
+        assertThat(createRes.getHeader("Content-Type")).contains("application/json");
         bookId = createRes.jsonPath().getInt("id");
         assertThat(bookId).isPositive();
     }
@@ -88,6 +90,7 @@ public class BookCrudTest {
 
         Response getRes = bookSteps.getBook(authToken, bookId);
         assertThat(getRes.statusCode()).isEqualTo(200);
+        assertThat(getRes.getHeader("Content-Type")).contains("application/json");
         assertThat(getRes.jsonPath().getString("name")).isEqualTo(testBook.getName());
         assertThat(getRes.jsonPath().getString("author")).isEqualTo(testBook.getAuthor());
         assertThat(getRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year());
@@ -107,6 +110,7 @@ public class BookCrudTest {
 
         Response updateRes = bookSteps.updateBook(authToken, bookId, testBook);
         assertThat(updateRes.statusCode()).isEqualTo(200);
+        assertThat(updateRes.getHeader("Content-Type")).contains("application/json");
         assertThat(updateRes.jsonPath().getString("name")).isEqualTo(testBook.getName());
         assertThat(updateRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year());
     }
@@ -121,6 +125,7 @@ public class BookCrudTest {
     public void testDeleteBook() {
         Response deleteRes = bookSteps.deleteBook(authToken, bookId);
         assertThat(deleteRes.statusCode()).isEqualTo(200);
+        assertThat(deleteRes.getHeader("Content-Type")).contains("application/json");
 
         Response getAfterDelete = bookSteps.getBook(authToken, bookId);
         assertThat(getAfterDelete.statusCode()).isEqualTo(404);
@@ -137,6 +142,7 @@ public class BookCrudTest {
         int invalidBookId = 9999999;
         Response res = bookSteps.getBook(authToken, invalidBookId);
         assertThat(res.statusCode()).isEqualTo(404); // Not found
+        assertThat(res.getHeader("Content-Type")).contains("application/json");
     }
 
     /**
@@ -148,5 +154,21 @@ public class BookCrudTest {
         if (bookId > 0) {
             bookSteps.deleteBook(authToken, bookId);
         }
+    }
+
+    /**
+     * Test for creating a new book with invalid data.
+     */
+    @Story("Create Book")
+    @Tag("negative")
+    @Severity(SeverityLevel.NORMAL)
+    @Test(description = "Attempt to create a book with invalid data", groups = {"negative"})
+    public void testCreateBookWithInvalidData() {
+        // Attempt to create a book with missing required fields (e.g., name)
+        Book invalidBook = new Book(null, "Invalid Author", 2023, "Book with missing name.");
+
+        Response createRes = bookSteps.createBook(authToken, invalidBook);
+        assertThat(createRes.statusCode()).isEqualTo(500);
+        assertThat(createRes.getHeader("Content-Type")).contains("text/plain; charset=utf-8");
     }
 }
