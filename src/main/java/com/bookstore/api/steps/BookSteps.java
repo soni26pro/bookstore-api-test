@@ -7,9 +7,7 @@ import com.bookstore.api.models.Book;
 import com.bookstore.api.utils.RequestSpecFactory;
 
 import io.qameta.allure.Step;
-
 import static io.restassured.RestAssured.given;
-
 import io.restassured.response.Response;
 
 public class BookSteps {
@@ -20,52 +18,70 @@ public class BookSteps {
     public Response createBook(String token, Book book) {
         logger.info("Creating a new book: {}", book);
 
-        return given()
+        Response response = given()
                 .spec(RequestSpecFactory.getRequestSpecWithAuth(token))
                 .body(book)
                 .when()
                 .post("/books/")
                 .then()
                 .extract().response();
+
+        logger.info("Create book response status code: {}", response.statusCode());
+        // Optionally log response body for debugging
+        // logger.debug("Create book response body: {}", response.getBody().asString());
+
+        return response;
     }
 
     @Step("Get book by ID: {bookId}")
     public Response getBook(String token, int bookId) {
         logger.info("Getting book with ID: {}", bookId);
 
-        // Use auth spec
-
-        return given()
+        Response response = given()
                 .spec(RequestSpecFactory.getRequestSpecWithAuth(token)) // Use auth spec
                 .when()
                 .get("/books/" + bookId)
                 .then().extract().response();
+
+        logger.info("Get book response status code: {}", response.statusCode());
+        // Optionally log response body for debugging
+        // logger.debug("Get book response body: {}", response.getBody().asString());
+
+        return response;
     }
 
     @Step("Update book with ID: {bookId}")
     public Response updateBook(String token, int bookId, Book book) {
         logger.info("Updating book with ID: {}", bookId);
 
-        // Use auth spec
-
-        return given()
+        Response response = given()
                 .spec(RequestSpecFactory.getRequestSpecWithAuth(token)) // Use auth spec
                 .body(book)
                 .when()
                 .put("/books/" + bookId)
                 .then().extract().response();
+
+        logger.info("Update book response status code: {}", response.statusCode());
+        // Optionally log response body for debugging
+        // logger.debug("Update book response body: {}", response.getBody().asString());
+
+        return response;
     }
 
     @Step("Delete book with ID: {bookId}")
     public Response deleteBook(String token, int bookId) {
         logger.info("Deleting book with ID: {}", bookId);
 
-        // Use auth spec
-
-        return given()
+        Response response = given()
                 .spec(RequestSpecFactory.getRequestSpecWithAuth(token)) // Use auth spec
                 .when()
                 .delete("/books/" + bookId)
                 .then().extract().response();
+
+        logger.info("Delete book response status code: {}", response.statusCode());
+        // Optionally log response body for debugging
+        // logger.debug("Delete book response body: {}", response.getBody().asString());
+
+        return response;
     }
 }

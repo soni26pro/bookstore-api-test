@@ -29,12 +29,18 @@ public class AuthSteps {
     public Response login(UserCredentials credentials) {
         logger.info("Attempting to login with user: {}", credentials.getEmail());
 
-        return given()
+        Response response = given()
                 .spec(RequestSpecFactory.getRequestSpec()) // No auth required for login
                 .body(credentials)
                 .when()
                 .post("/login")
                 .then().extract().response();
+
+        logger.info("Login response status code: {}", response.statusCode());
+        // Optionally log response body for debugging, be cautious with sensitive data
+        // logger.debug("Login response body: {}", response.getBody().asString());
+
+        return response;
     }
 
     /**
@@ -47,6 +53,12 @@ public class AuthSteps {
     @Step("Extract access token from login response")
     public String extractAccessToken(Response response) {
         logger.info("Extracting access token from login response");
-        return response.jsonPath().getString("access_token");
+        String accessToken = response.jsonPath().getString("access_token");
+        if (accessToken == null || accessToken.isEmpty()) {
+            logger.warn("Access token not found in login response.");
+        } else {
+            logger.info("Access token extracted successfully.");
+        }
+        return accessToken;
     }
 }
