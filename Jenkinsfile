@@ -7,16 +7,15 @@ pipeline {
     }
 
     environment {
-        BASE_URL = 'http://localhost:8000'
         REPO = 'https://github.com/soni26pro/bookstore-api-test.git'
+        BASE_URL = 'http://localhost:8000'
     }
 
     stages {
-
-        stage('Checkout API (main branch)') {
+        stage('Clone API from main') {
             steps {
                 dir('bookstore-api') {
-                    git url: "${REPO}", branch: 'main'
+                    git branch: 'main', url: "${REPO}"
                 }
             }
         }
@@ -27,6 +26,7 @@ pipeline {
                     sh '''
                         python3 -m venv venv
                         source venv/bin/activate
+                        pip install --upgrade pip
                         pip install -r requirements.txt
                         nohup venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 &
                         sleep 5
@@ -35,15 +35,15 @@ pipeline {
             }
         }
 
-        stage('Checkout Tests (tests branch)') {
+        stage('Clone Test Framework from tests') {
             steps {
                 dir('bookstore-tests') {
-                    git url: "${REPO}", branch: 'tests'
+                    git branch: 'tests', url: "${REPO}"
                 }
             }
         }
 
-        stage('Build and Run Tests') {
+        stage('Run Tests') {
             steps {
                 dir('bookstore-tests') {
                     sh "mvn clean test -Dapi.base.url=${BASE_URL}"
@@ -72,8 +72,14 @@ pipeline {
 
     post {
         always {
-            echo 'Stopping FastAPI...'
+            echo 'Shutting down FastAPI server...'
             sh 'pkill -f uvicorn || true'
+        }
+        success {
+            slackSend color: 'good', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} passed. Allure Report: ${env.BUILD_URL}allure/"
+        }
+        failure {
+            slackSend color: 'danger', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed. See: ${env.BUILD_URL}"
         }
     }
 }
