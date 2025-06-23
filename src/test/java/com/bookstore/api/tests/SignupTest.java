@@ -7,16 +7,28 @@ import com.bookstore.api.models.UserCredentials;
 import com.bookstore.api.steps.SignupSteps;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.qameta.allure.testng.Tag;
 import io.restassured.response.Response;
 
+/**
+ * Test suite to validate the user signup flow via API.
+ */
 @Feature("User Signup")
 public class SignupTest {
 
     SignupSteps signupSteps = new SignupSteps();
 
+    /**
+     * Test to verify successful signup of a new user with a unique email address.
+     * This test dynamically generates a new email to avoid conflicts.
+     */
     @Story("Successful Signup")
-    @Test(description = "Signup a new user - success scenario")
+    @Tag("positive")
+    @Severity(SeverityLevel.CRITICAL)
+    @Test(description = "Signup a new user - success scenario", groups = {"positive"})
     public void testSignupSuccess() {
         UserCredentials user = new UserCredentials("user" + System.currentTimeMillis() + "@mail.com", "pass123");
         Response res = signupSteps.signup(user);
@@ -25,14 +37,20 @@ public class SignupTest {
         assertEquals(res.jsonPath().getString("message"), "User created successfully");
     }
 
+    /**
+     * Negative test to verify that attempting to sign up with an existing email
+     * results in a 400 Bad Request response.
+     */
     @Story("Duplicate Signup Attempt")
-    @Test(description = "Signup with existing email - negative test")
+    @Tag("negative")
+    @Severity(SeverityLevel.NORMAL)
+    @Test(description = "Signup with existing email - negative test", groups = {"negative"})
     public void testSignupDuplicate() {
         String email = "existing@mail.com";
         UserCredentials user = new UserCredentials(email, "pass123");
 
-        signupSteps.signup(user);
-        Response res = signupSteps.signup(user);
+        signupSteps.signup(user); // First signup attempt
+        Response res = signupSteps.signup(user); // Duplicate signup
 
         assertEquals(res.statusCode(), 400);
         assertEquals(res.jsonPath().getString("detail"), "Email already registered");
