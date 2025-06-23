@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Bookstore API Test Suite" parallel="methods" thread-count="5">
+    <test name="Signup API Tests">
+        <classes>
+            <class name="com.bookstore.api.tests.SignupTest"/>
+        </classes>
+    </test>
+
+    <test name="Book CRUD API Tests">
+        <classes>
+            <class name="com.bookstore.api.tests.BookCrudTest"/>
+        </classes>
+    </test>
+</suite>
