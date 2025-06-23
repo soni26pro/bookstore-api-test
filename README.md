@@ -7,6 +7,7 @@ This project provides automated API tests for a Bookstore application. It is bui
 - **Java**: The primary programming language.
 - **TestNG**: A testing framework for organizing and running tests.
 - **REST Assured**: A Java library for simplifying REST API testing.
+- **AssertJ**: A fluent assertion library for Java, providing rich and readable assertions.
 - **Maven**: A build automation tool used for dependency management and project build lifecycle.
 - **Allure Report**: A flexible lightweight test reporting tool that provides clear and detailed reports.
 
