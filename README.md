@@ -35,7 +35,7 @@ The project is organized into the following main directories:
 - **Structured Tests**: Tests are organized using TestNG and step classes, improving readability and maintainability.
 - **API Modeling**: Using model classes for API data ensures type safety and clarity.
 - **Reusable Utilities**: Common functionalities like configuration loading and request setup are centralized in utility classes.
-- **Detailed Reporting**: Integration with Allure Report provides comprehensive and easy-to-understand test results, including request/response details.
+- **Detailed Reporting**: Integration with Allure Report provides comprehensive and easy-to-understand test results, including request/response details and **granular assertion results** via `Allure.step()`.
 - **Maven Build**: Standardized build process using Maven simplifies dependency management and test execution.
 
 ## 🧪 Testing Strategy
@@ -51,7 +51,8 @@ Our testing strategy focuses on providing comprehensive and maintainable API tes
     -   **Logging**: Integrated logging provides visibility into test execution and API responses, aiding in debugging.
 -   **Challenges Faced**:
     -   Handling dynamic data like authentication tokens and generated resource IDs requires careful implementation of request chaining.
-    -   Ensuring comprehensive negative test coverage for various error conditions (e.g., invalid input, unauthorized access) requires thorough API analysis.
+    -   Ensuring comprehensive negative test coverage for various error conditions (e.g., invalid input, unauthorized access) requires thorough API analysis. We have started expanding coverage to include scenarios like **creating resources with invalid data**.
+    -   Validating API responses comprehensively, including **status codes, response payloads, and headers (like Content-Type)**.
     -   Setting up and managing the test environment and dependencies can sometimes pose challenges.
 
 ## ▶️ Prerequisites
@@ -92,3 +93,14 @@ After running the tests with `mvn clean test`, the test results will be generate
     ```
 
 *(Note: Ensure the Allure command-line tool is installed and accessible in your system's PATH.)*
+
+## 🔄 Continuous Integration (CI)
+
+This project includes a basic CI pipeline configured using **GitHub Actions**. The workflow is defined in `.github/workflows/ci.yml`.
+
+The CI pipeline is triggered on pushes to the `main` branch and includes steps to:
+- Checkout the code.
+- Set up the Java Development Kit (JDK).
+- Build the project and run the tests using Maven.
+
+You can extend this workflow to include additional steps like publishing Allure reports or integrating with other tools.
