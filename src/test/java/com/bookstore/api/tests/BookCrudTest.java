@@ -12,6 +12,7 @@ import com.bookstore.api.steps.BookSteps;
 import com.bookstore.api.steps.SignupSteps;
 import com.github.javafaker.Faker;
 
+import io.qameta.allure.Allure;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
@@ -52,13 +53,19 @@ public class BookCrudTest {
 
         // Register user
         Response signupRes = signupSteps.signup(user);
-        assertThat(signupRes.statusCode()).isEqualTo(200);
+        Allure.step("Assert signup response status code is 200", () ->
+            assertThat(signupRes.statusCode()).isEqualTo(200)
+        );
 
         // Login and get token
         Response loginRes = authSteps.login(user);
-        assertThat(loginRes.statusCode()).isEqualTo(200);
+        Allure.step("Assert login response status code is 200", () ->
+            assertThat(loginRes.statusCode()).isEqualTo(200)
+        );
         authToken = authSteps.extractAccessToken(loginRes);
-        assertThat(authToken).isNotEmpty();
+        Allure.step("Assert auth token is not empty", () ->
+            assertThat(authToken).isNotEmpty()
+        );
     }
 
     /**
@@ -72,10 +79,18 @@ public class BookCrudTest {
         Book testBook = new Book("The Sun Also Rises", "Fredric Hodkiewicz", 2020, "A classic novel by Hemingway.");
 
         Response createRes = bookSteps.createBook(authToken, testBook);
-        assertThat(createRes.statusCode()).isEqualTo(200);
-        assertThat(createRes.getHeader("Content-Type")).contains("application/json");
+
+        Allure.step("Assert response status code is 200", () ->
+            assertThat(createRes.statusCode()).isEqualTo(200)
+        );
+        Allure.step("Assert Content-Type header is application/json", () ->
+            assertThat(createRes.getHeader("Content-Type")).contains("application/json")
+        );
+
         bookId = createRes.jsonPath().getInt("id");
-        assertThat(bookId).isPositive();
+        Allure.step("Assert created book ID is positive", () ->
+            assertThat(bookId).isPositive()
+        );
     }
 
     /**
@@ -89,11 +104,22 @@ public class BookCrudTest {
         Book testBook = new Book("The Sun Also Rises", "Fredric Hodkiewicz", 2020, "A classic novel by Hemingway.");
 
         Response getRes = bookSteps.getBook(authToken, bookId);
-        assertThat(getRes.statusCode()).isEqualTo(200);
-        assertThat(getRes.getHeader("Content-Type")).contains("application/json");
-        assertThat(getRes.jsonPath().getString("name")).isEqualTo(testBook.getName());
-        assertThat(getRes.jsonPath().getString("author")).isEqualTo(testBook.getAuthor());
-        assertThat(getRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year());
+
+        Allure.step("Assert response status code is 200", () ->
+            assertThat(getRes.statusCode()).isEqualTo(200)
+        );
+        Allure.step("Assert Content-Type header is application/json", () ->
+            assertThat(getRes.getHeader("Content-Type")).contains("application/json")
+        );
+        Allure.step("Assert book name matches", () ->
+            assertThat(getRes.jsonPath().getString("name")).isEqualTo(testBook.getName())
+        );
+        Allure.step("Assert book author matches", () ->
+            assertThat(getRes.jsonPath().getString("author")).isEqualTo(testBook.getAuthor())
+        );
+        Allure.step("Assert book published year matches", () ->
+            assertThat(getRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year())
+        );
     }
 
     /**
@@ -109,10 +135,19 @@ public class BookCrudTest {
         testBook.setPublished_year(2022);
 
         Response updateRes = bookSteps.updateBook(authToken, bookId, testBook);
-        assertThat(updateRes.statusCode()).isEqualTo(200);
-        assertThat(updateRes.getHeader("Content-Type")).contains("application/json");
-        assertThat(updateRes.jsonPath().getString("name")).isEqualTo(testBook.getName());
-        assertThat(updateRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year());
+
+        Allure.step("Assert response status code is 200", () ->
+            assertThat(updateRes.statusCode()).isEqualTo(200)
+        );
+        Allure.step("Assert Content-Type header is application/json", () ->
+            assertThat(updateRes.getHeader("Content-Type")).contains("application/json")
+        );
+        Allure.step("Assert book name is updated", () ->
+            assertThat(updateRes.jsonPath().getString("name")).isEqualTo(testBook.getName())
+        );
+        Allure.step("Assert book published year is updated", () ->
+            assertThat(updateRes.jsonPath().getInt("published_year")).isEqualTo(testBook.getPublished_year())
+        );
     }
 
     /**
@@ -124,11 +159,17 @@ public class BookCrudTest {
     @Test(description = "Delete the created book", dependsOnMethods = "testUpdateBook", groups = {"positive"})
     public void testDeleteBook() {
         Response deleteRes = bookSteps.deleteBook(authToken, bookId);
-        assertThat(deleteRes.statusCode()).isEqualTo(200);
-        assertThat(deleteRes.getHeader("Content-Type")).contains("application/json");
+        Allure.step("Assert delete response status code is 200", () ->
+            assertThat(deleteRes.statusCode()).isEqualTo(200)
+        );
+        Allure.step("Assert Content-Type header is application/json", () ->
+            assertThat(deleteRes.getHeader("Content-Type")).contains("application/json")
+        );
 
         Response getAfterDelete = bookSteps.getBook(authToken, bookId);
-        assertThat(getAfterDelete.statusCode()).isEqualTo(404);
+        Allure.step("Assert get after delete status code is 404", () ->
+            assertThat(getAfterDelete.statusCode()).isEqualTo(404)
+        );
     }
 
     /**
@@ -141,8 +182,13 @@ public class BookCrudTest {
     public void testReadNonExistentBook() {
         int invalidBookId = 9999999;
         Response res = bookSteps.getBook(authToken, invalidBookId);
-        assertThat(res.statusCode()).isEqualTo(404); // Not found
-        assertThat(res.getHeader("Content-Type")).contains("application/json");
+
+        Allure.step("Assert response status code is 404 (Not Found)", () ->
+            assertThat(res.statusCode()).isEqualTo(404)
+        );
+        Allure.step("Assert Content-Type header is application/json", () ->
+            assertThat(res.getHeader("Content-Type")).contains("application/json")
+        );
     }
 
     /**
@@ -168,7 +214,11 @@ public class BookCrudTest {
         Book invalidBook = new Book(null, "Invalid Author", 2023, "Book with missing name.");
 
         Response createRes = bookSteps.createBook(authToken, invalidBook);
-        assertThat(createRes.statusCode()).isEqualTo(500);
-        assertThat(createRes.getHeader("Content-Type")).contains("text/plain; charset=utf-8");
+        Allure.step("Assert response status code is 500 (Internal Server Error)", () ->
+            assertThat(createRes.statusCode()).isEqualTo(500)
+        );
+        Allure.step("Assert Content-Type header is text/plain", () ->
+            assertThat(createRes.getHeader("Content-Type")).contains("text/plain; charset=utf-8")
+        );
     }
 }

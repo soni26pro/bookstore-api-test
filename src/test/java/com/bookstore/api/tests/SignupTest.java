@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import com.bookstore.api.models.UserCredentials;
 import com.bookstore.api.steps.SignupSteps;
 
+import io.qameta.allure.Allure;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
@@ -33,8 +34,12 @@ public class SignupTest {
         UserCredentials user = new UserCredentials("user" + System.currentTimeMillis() + "@mail.com", "pass123");
         Response res = signupSteps.signup(user);
 
-        assertEquals(res.statusCode(), 200);
-        assertEquals(res.jsonPath().getString("message"), "User created successfully");
+        Allure.step("Assert response status code is 200", () ->
+            assertEquals(res.statusCode(), 200)
+        );
+        Allure.step("Assert success message is 'User created successfully'", () ->
+            assertEquals(res.jsonPath().getString("message"), "User created successfully")
+        );
     }
 
     /**
@@ -52,7 +57,11 @@ public class SignupTest {
         signupSteps.signup(user); // First signup attempt
         Response res = signupSteps.signup(user); // Duplicate signup
 
-        assertEquals(res.statusCode(), 400);
-        assertEquals(res.jsonPath().getString("detail"), "Email already registered");
+        Allure.step("Assert duplicate signup response status code is 400", () ->
+            assertEquals(res.statusCode(), 400)
+        );
+        Allure.step("Assert error message is 'Email already registered'", () ->
+            assertEquals(res.jsonPath().getString("detail"), "Email already registered")
+        );
     }
 }
