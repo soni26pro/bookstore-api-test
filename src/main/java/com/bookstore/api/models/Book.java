@@ -109,4 +109,20 @@ public class Book {
     public void setBook_summary(String book_summary) {
         this.book_summary = book_summary;
     }
+
+    /**
+     * Returns a string representation of this Book.
+     * This is useful for logging and debugging.
+     *
+     * @return a string representation of the book
+     */
+    @Override
+    public String toString() {
+        return "Book{" +
+                "name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", published_year=" + published_year +
+                ", summary='" + book_summary + '\'' +
+                '}';
+    }
 }

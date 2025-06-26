@@ -3,9 +3,9 @@
 
     <!-- Example: Run all tests -->
     <test name="All API Tests">
-        <classes>
-            <class name="com.bookstore.api.tests.SignupTest"/>
-            <class name="com.bookstore.api.tests.BookCrudTest"/>
-        </classes>
+        <packages>
+            <package name="com.bookstore.api.tests.positive.*"/>
+            <package name="com.bookstore.api.tests.negative.*"/>
+        </packages>
     </test>
 </suite>

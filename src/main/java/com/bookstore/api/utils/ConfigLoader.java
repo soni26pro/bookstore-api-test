@@ -3,6 +3,7 @@ package com.bookstore.api.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.nio.file.Paths;
 
 /**
  * Utility class to load configuration properties from a properties file
@@ -64,5 +65,37 @@ public class ConfigLoader {
             throw new RuntimeException("Property '" + key + "' not found in the configuration.");
         }
         return value;
+    }
+
+    /**
+     * Sets the value of a given property key in the configuration.
+     *
+     * @param key the name of the property to set
+     * @param value the value to set for the property
+     */
+    public static void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    /**
+     * Saves the current properties to the configuration file.
+     * This will overwrite the existing file.
+     */
+    public static void save() {
+        String env = System.getProperty(ENV_SYSTEM_PROPERTY);
+        String configFileName = BASE_CONFIG_FILE + (env != null && !env.isEmpty() ? "-" + env : "") + PROPERTIES_EXTENSION;
+
+        // Save to the actual source file in src/test/resources
+        String projectDir = System.getProperty("user.dir");
+        java.nio.file.Path configPath = Paths.get(projectDir, "src", "test", "resources", configFileName);
+
+        try (java.io.OutputStream output = new java.io.FileOutputStream(configPath.toFile())) {
+            properties.store(output, null);
+            System.out.println("Successfully saved properties to: " + configPath);
+        } catch (Exception ex) {
+            System.err.println("Failed to save configuration file: " + configPath);
+            ex.printStackTrace();
+            throw new RuntimeException("Failed to save configuration file: " + configFileName, ex);
+        }
     }
 }
